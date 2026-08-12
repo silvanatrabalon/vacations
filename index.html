@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>España 2026 — Itinerario</title>
+<style>
+  :root {
+    --bg: #eef1ef; --surface: #ffffff; --surface-2: #f4f6f4; --text: #1a2420; --text-muted: #5c6b64;
+    --border: #dde2dd; --border-strong: #c2cbc4; --accent: #c15a2b; --accent-ink: #ffffff; --accent-soft: #f2ded2;
+    --cat-vuelo: #2f6fb0; --cat-vuelo-soft: #dde9f5; --cat-traslado: #2c8a7a; --cat-traslado-soft: #dcefe9;
+    --cat-hospedaje: #7e59a8; --cat-hospedaje-soft: #e9e0f2; --cat-actividad: #c1791f; --cat-actividad-soft: #f5e6cd;
+    --shadow: 0 1px 2px rgba(20,30,25,.06), 0 4px 14px rgba(20,30,25,.06); --radius: 14px; color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10151a; --surface: #182027; --surface-2: #1d2730; --text: #eef3ef; --text-muted: #9aa9a1;
+      --border: #262f37; --border-strong: #3a4650; --accent: #e08a5c; --accent-ink: #171008; --accent-soft: #3a2c22;
+      --cat-vuelo: #7bb0e8; --cat-vuelo-soft: #1f2f3d; --cat-traslado: #6fd0bd; --cat-traslado-soft: #1b3230;
+      --cat-hospedaje: #c6a6e8; --cat-hospedaje-soft: #2a2438; --cat-actividad: #eab35f; --cat-actividad-soft: #33291a;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10151a; --surface: #182027; --surface-2: #1d2730; --text: #eef3ef; --text-muted: #9aa9a1;
+    --border: #262f37; --border-strong: #3a4650; --accent: #e08a5c; --accent-ink: #171008; --accent-soft: #3a2c22;
+    --cat-vuelo: #7bb0e8; --cat-vuelo-soft: #1f2f3d; --cat-traslado: #6fd0bd; --cat-traslado-soft: #1b3230;
+    --cat-hospedaje: #c6a6e8; --cat-hospedaje-soft: #2a2438; --cat-actividad: #eab35f; --cat-actividad-soft: #33291a;
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg: #eef1ef; --surface: #ffffff; --surface-2: #f4f6f4; --text: #1a2420; --text-muted: #5c6b64;
+    --border: #dde2dd; --border-strong: #c2cbc4; --accent: #c15a2b; --accent-ink: #ffffff; --accent-soft: #f2ded2;
+    --cat-vuelo: #2f6fb0; --cat-vuelo-soft: #dde9f5; --cat-traslado: #2c8a7a; --cat-traslado-soft: #dcefe9;
+    --cat-hospedaje: #7e59a8; --cat-hospedaje-soft: #e9e0f2; --cat-actividad: #c1791f; --cat-actividad-soft: #f5e6cd;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  html { min-height: 100%; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: -apple-system, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  svg { display: block; }
+  a { color: inherit; }
+
+  .app { max-width: 640px; margin: 0 auto; padding-bottom: 84px; }
+
+  .topbar { padding: 18px 18px 4px; }
+  .topbar h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
+  .topbar .range { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
+  .topbar .travelers { color: var(--text-muted); font-size: 0.78rem; margin-top: 2px; }
+
+  /* ---------- Home: hero route ---------- */
+  .hero { margin: 14px 18px 18px; padding: 14px 10px 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .hero .label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; padding: 0 6px 8px; }
+  .route { display: flex; align-items: flex-start; overflow-x: auto; padding: 2px 4px 2px; }
+  .route .node { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: none; min-width: 72px; }
+  .route .node .badge { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); color: var(--text-muted); display: flex; align-items: center; justify-content: center; flex: none; }
+  .route .node .badge svg { width: 18px; height: 18px; }
+  .route .node .city { font-size: 0.74rem; font-weight: 800; }
+  .route .node .date { font-size: 0.62rem; color: var(--text-muted); text-align: center; line-height: 1.2; }
+  .route .node[data-kind="salida"] .badge { background: var(--cat-traslado-soft); color: var(--cat-traslado); }
+  .route .node[data-kind="salida"] .date { color: var(--cat-traslado); font-weight: 700; }
+  .route .node[data-kind="llegada"] .badge { background: var(--cat-actividad-soft); color: var(--cat-actividad); }
+  .route .node[data-kind="llegada"] .date { color: var(--cat-actividad); font-weight: 700; }
+  .route .connector { flex: 1; min-width: 22px; height: 0; border-top: 2px dashed var(--border-strong); margin-top: 17px; }
+
+  /* ---------- Home: day list ---------- */
+  .daylist { padding: 0 18px; display: flex; flex-direction: column; gap: 10px; }
+  .daycard {
+    display: flex; gap: 12px; align-items: flex-start; padding: 12px 12px 12px 10px; border-radius: 14px;
+    border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow); cursor: pointer;
+    text-align: left; width: 100%;
+  }
+  .daycard .datebox { flex: none; width: 50px; text-align: center; background: var(--surface-2); border-radius: 10px; padding: 7px 2px 6px; }
+  .daycard .datebox .wd { display: block; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; }
+  .daycard .datebox .num { display: block; font-size: 1.2rem; font-weight: 800; font-family: ui-monospace, monospace; margin-top: 1px; }
+  .daycard .body { flex: 1; min-width: 0; padding-top: 1px; }
+  .daycard .city { font-size: 0.68rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+  .daycard .highlights { display: flex; flex-direction: column; gap: 4px; margin-top: 7px; }
+  .daycard .empty-note { font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top: 7px; }
+  .hl-row { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--text); }
+  .hl-row .ic { width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .hl-row .ic svg { width: 12px; height: 12px; }
+  .hl-row .more { color: var(--text-muted); font-size: 0.74rem; padding-left: 27px; }
+  .daycard .chev { flex: none; align-self: center; color: var(--text-muted); width: 18px; height: 18px; }
+
+  /* ---------- Day detail ---------- */
+  .day-detail-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px 12px; }
+  .iconbtn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; color: var(--text); cursor: pointer; flex: none; }
+  .iconbtn svg { width: 17px; height: 17px; }
+  .iconbtn:disabled { opacity: 0.35; cursor: default; }
+  .day-detail-head .titles { flex: 1; min-width: 0; text-align: center; }
+  .day-detail-head .titles .d { font-weight: 800; font-size: 1.05rem; }
+  .day-detail-head .titles .c { font-size: 0.72rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .ticket { display: flex; gap: 12px; align-items: center; margin: 0 18px 10px; padding: 12px 14px; border: 1px dashed var(--border-strong); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+  .ticket .icon-badge { width: 42px; height: 42px; border-radius: 12px; flex: none; }
+  .ticket .body2 { min-width: 0; }
+  .ticket .body2 .title { font-weight: 700; font-size: 0.92rem; }
+  .ticket .body2 .sub { color: var(--text-muted); font-size: 0.78rem; margin-top: 1px; }
+  .ticket .body2 .code { color: var(--text-muted); font-size: 0.72rem; margin-top: 2px; }
+  .ticket .time { margin-left: auto; font-weight: 800; font-size: 0.95rem; text-align: right; flex: none; }
+
+  .band { margin: 0 18px 8px; }
+  .band-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: var(--text-muted); padding: 0 2px 6px; display: block; }
+  .ticket-section-label { display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; color: var(--accent); padding: 0 18px 8px; }
+  .day-divider { height: 1px; background: var(--border); margin: 6px 18px 18px; }
+  .band-empty { font-size: 0.78rem; color: var(--text-muted); padding: 2px 2px 10px; font-style: italic; }
+
+  .item { display: flex; gap: 11px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 7px; box-shadow: var(--shadow); }
+  .icon-badge { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .icon-badge svg { width: 18px; height: 18px; }
+  .icon-badge[data-cat="vuelo"] { background: var(--cat-vuelo-soft); color: var(--cat-vuelo); }
+  .icon-badge[data-cat="traslado"] { background: var(--cat-traslado-soft); color: var(--cat-traslado); }
+  .icon-badge[data-cat="hospedaje"] { background: var(--cat-hospedaje-soft); color: var(--cat-hospedaje); }
+  .icon-badge[data-cat="actividad"] { background: var(--cat-actividad-soft); color: var(--cat-actividad); }
+  .item .content { flex: 1; min-width: 0; padding-top: 1px; }
+  .item .content .row1 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .item .content .title { font-weight: 700; font-size: 0.9rem; }
+  .item .content .time { font-size: 0.74rem; color: var(--text-muted); flex: none; }
+  .item .content .sub { color: var(--text-muted); font-size: 0.78rem; margin-top: 2px; }
+  .item .content .info { color: var(--text-muted); font-size: 0.72rem; margin-top: 3px; }
+  .loc, .doc-link { display: flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 0.74rem; }
+  .loc a, .doc-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  .loc svg, .doc-link svg { width: 12px; height: 12px; flex: none; color: var(--text-muted); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+  body { touch-action: pan-y; }
+  .route { touch-action: pan-x; }
+
+  /* ---------- Other tabs ---------- */
+  .panel { padding: 6px 18px 0; display: none; }
+  .panel.active { display: block; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .card .row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .card h3 { margin: 0 0 2px; font-size: 0.95rem; font-weight: 800; }
+  .card .tag { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .card .tag.ida { background: var(--cat-vuelo-soft); color: var(--cat-vuelo); }
+  .card .tag.vuelta { background: var(--cat-actividad-soft); color: var(--cat-actividad); }
+  .card .tag.tren { background: var(--cat-traslado-soft); color: var(--cat-traslado); }
+  .card .tag.domestico { background: var(--cat-hospedaje-soft); color: var(--cat-hospedaje); }
+  .flight-route { display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; }
+  .flight-route .pt { text-align: center; }
+  .flight-route .pt .code { font-family: ui-monospace, monospace; font-weight: 800; font-size: 1.15rem; }
+  .flight-route .pt .hm { font-size: 0.72rem; color: var(--text-muted); }
+  .flight-route .line { flex: 1; height: 1px; background: var(--border-strong); position: relative; }
+  .flight-route .line .icon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--surface); color: var(--text-muted); width: 16px; height: 16px; }
+  .card .meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.76rem; color: var(--text-muted); }
+  .card .meta b { color: var(--text); font-family: ui-monospace, monospace; }
+  .card .withicon { display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; }
+  .stay-dates { display: flex; flex-direction: column; gap: 3px; font-size: 0.76rem; color: var(--text-muted); }
+  .stay-dates b { color: var(--text); font-family: ui-monospace, monospace; }
+
+  .tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); box-shadow: 0 -2px 12px rgba(0,0,0,0.06); }
+  .tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; color: var(--text-muted); font-size: 0.63rem; font-weight: 700; padding: 6px 2px; border-radius: 10px; cursor: pointer; }
+  .tabbar button svg { width: 20px; height: 20px; }
+  .tabbar button.active { color: var(--accent); }
+
+  @media (min-width: 700px) {
+    .app { max-width: 720px; padding-bottom: 40px; }
+    .topbar { padding: 28px 0 4px; }
+    .topbar h1 { font-size: 1.9rem; }
+    .tabbar { position: static; box-shadow: none; border-top: 1px solid var(--border); justify-content: flex-start; gap: 4px; padding: 14px 0 8px; margin-top: 20px; }
+    .tabbar button { flex: 0 0 auto; flex-direction: row; padding: 8px 14px; font-size: 0.78rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <h1>España 2026</h1>
+    <div class="range">22 – 30 de agosto · Madrid + escapada a Barcelona</div>
+    <div class="travelers">Silvana, Jorge y Graciela</div>
+  </header>
+
+  <section class="screen active" id="screen-home">
+    <div class="hero">
+      <div class="label">Ruta del viaje</div>
+      <div class="route" id="route"></div>
+    </div>
+    <div class="daylist" id="daylist"></div>
+  </section>
+
+  <section class="screen" id="screen-day">
+    <div class="day-detail-head">
+      <button class="iconbtn" id="prevBtn" aria-label="Día anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="titles">
+        <div class="d" id="dayTitle"></div>
+        <div class="c" id="dayCity"></div>
+      </div>
+      <button class="iconbtn" id="nextBtn" aria-label="Día siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div id="dayContent"></div>
+  </section>
+
+  <section class="panel" id="panel-vuelos">
+    <div class="card">
+      <div class="row"><h3>AR 1739 · Aerolíneas Argentinas</h3><span class="tag domestico">Doméstico · ida</span></div>
+      <div class="flight-route">
+        <div class="pt"><div class="code">RES</div><div class="hm mono">09:45</div></div>
+        <div class="line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16l20-6-6 6 6 6-20-6z" transform="rotate(45 12 12)"/></svg></div>
+        <div class="pt"><div class="code">AEP</div><div class="hm mono">11:15</div></div>
+      </div>
+      <div class="meta"><span>Sáb 22 ago</span><span>Resistencia → Aeroparque</span><span>Reserva <b>WWVPZQ</b></span></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3>AR 1134 · Aerolíneas Argentinas</h3><span class="tag ida">Internacional · ida</span></div>
+      <div class="flight-route">
+        <div class="pt"><div class="code">EZE</div><div class="hm mono">15:05</div></div>
+        <div class="line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16l20-6-6 6 6 6-20-6z" transform="rotate(45 12 12)"/></svg></div>
+        <div class="pt"><div class="code">MAD</div><div class="hm mono">08:20</div></div>
+      </div>
+      <div class="meta"><span>Sáb 22 → Dom 23 ago</span><span>Vuelo nocturno · 12h15m</span></div>
+      <div class="meta" style="margin-top:6px;"><span>Silvana: <b>JGRWHY</b></span><span>Jorge / Graciela: <b>WWEMKL</b></span></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3>iryo 06081</h3><span class="tag tren">Tren · ida a Barcelona</span></div>
+      <div class="flight-route">
+        <div class="pt"><div class="code">MAD</div><div class="hm mono">08:22</div></div>
+        <div class="line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="7" width="16" height="11" rx="2"/><path d="M8 3v4M16 3v4M4 14h16"/></svg></div>
+        <div class="pt"><div class="code">BCN</div><div class="hm mono">11:24</div></div>
+      </div>
+      <div class="meta"><span>Mar 25 ago</span><span>Atocha-Almudena Grandes → Sants</span><span>Reserva <b>48SM69 / 1Y4B2W</b></span></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3>Ouigo 06610</h3><span class="tag tren">Tren · vuelta a Madrid</span></div>
+      <div class="flight-route">
+        <div class="pt"><div class="code">BCN</div><div class="hm mono">20:20</div></div>
+        <div class="line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="7" width="16" height="11" rx="2"/><path d="M8 3v4M16 3v4M4 14h16"/></svg></div>
+        <div class="pt"><div class="code">MAD</div><div class="hm mono">23:48</div></div>
+      </div>
+      <div class="meta"><span>Mié 26 ago</span><span>Sants → Atocha-Almudena Grandes</span><span>Reserva <b>48SM69 / 1Y4B2W</b></span></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3>AR 1135 · Aerolíneas Argentinas</h3><span class="tag vuelta">Internacional · vuelta</span></div>
+      <div class="flight-route">
+        <div class="pt"><div class="code">MAD</div><div class="hm mono">10:55</div></div>
+        <div class="line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16l20-6-6 6 6 6-20-6z" transform="rotate(45 12 12)"/></svg></div>
+        <div class="pt"><div class="code">EZE</div><div class="hm mono">19:00</div></div>
+      </div>
+      <div class="meta"><span>Sáb 29 ago</span><span>13h05m</span></div>
+      <div class="meta" style="margin-top:6px;"><span>Silvana: <b>JGRWHY</b></span><span>Jorge / Graciela: <b>WWEMKL</b></span></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3>AR 1748 · Aerolíneas Argentinas</h3><span class="tag domestico">Doméstico · vuelta</span></div>
+      <div class="flight-route">
+        <div class="pt"><div class="code">EZE</div><div class="hm mono">09:10</div></div>
+        <div class="line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16l20-6-6 6 6 6-20-6z" transform="rotate(45 12 12)"/></svg></div>
+        <div class="pt"><div class="code">CNQ</div><div class="hm mono">10:45</div></div>
+      </div>
+      <div class="meta"><span>Dom 30 ago</span><span>Ezeiza → Corrientes</span><span>Reserva <b>WWVPZQ</b></span></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-hospedaje">
+    <div class="card">
+      <div class="row"><h3>Atocha 2 Dormitorios</h3><span class="tag ida">Madrid</span></div>
+      <div class="stay-dates"><span>Check-in <b>Sáb 22, 15:00</b></span><span>Check-out <b>Sáb 29, 11:00</b></span></div>
+      <div class="withicon"><div class="icon-badge" data-cat="hospedaje"></div><div><div class="sub" style="color:var(--text-muted); font-size:0.8rem;">C. de Atocha 38, Centro, 28012 Madrid</div><div class="sub" style="color:var(--text-muted); font-size:0.74rem; margin-top:2px;">Anfitrión: Plenora · Confirmación HM9YN8B38M</div><div class="loc" data-addr="C. de Atocha 38, Centro, 28012 Madrid"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3>Spectacular Sagrada Família Views</h3><span class="tag vuelta">Barcelona</span></div>
+      <div class="stay-dates"><span>Check-in <b>Mar 25, 15:00</b></span><span>Check-out <b>Mié 26, 11:00</b></span></div>
+      <div class="withicon"><div class="icon-badge" data-cat="hospedaje"></div><div><div class="sub" style="color:var(--text-muted); font-size:0.8rem;">Carrer de la Marina 292, Eixample, 08025 Barcelona</div><div class="sub" style="color:var(--text-muted); font-size:0.74rem; margin-top:2px;">Anfitrión: Belen · Confirmación HMDBBCNQWH</div><div class="loc" data-addr="Carrer de la Marina 292, Eixample, 08025 Barcelona"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3>Hotel Sarmiento Palace ★★★</h3><span class="tag domestico">Buenos Aires</span></div>
+      <div class="stay-dates"><span>Check-in <b>Sáb 29, 15:00</b></span><span>Check-out <b>Dom 30, 11:00</b></span></div>
+      <div class="withicon"><div class="icon-badge" data-cat="hospedaje"></div><div><div class="sub" style="color:var(--text-muted); font-size:0.8rem;">Sarmiento 1953, Buenos Aires</div><div class="loc" data-addr="Sarmiento 1953, Buenos Aires"></div></div></div>
+    </div>
+  </section>
+
+  <nav class="tabbar" id="tabbar">
+    <button data-tab="itinerario" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      Itinerario
+    </button>
+    <button data-tab="vuelos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16l20-6-6 6 6 6-20-6z" transform="rotate(45 12 12)"/></svg>
+      Vuelos y trenes
+    </button>
+    <button data-tab="hospedaje">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20V9M3 13h18M7 9V6a2 2 0 012-2h6a2 2 0 012 2v3M21 20v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7"/></svg>
+      Hospedaje
+    </button>
+  </nav>
+</div>
+
+<script>
+  const ICONS = {
+    vuelo: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 15.5v-2l-8-5V4a1.5 1.5 0 00-3 0v4.5l-8 5v2l8-2.4V18l-2.6 1.9V21l3.6-1 3.6 1v-1.1L12.5 18v-4.9l8.5 2.4z"/></svg>',
+    tren: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="13" rx="4" fill="currentColor"/><rect x="7" y="7.2" width="4" height="4" rx="1" style="fill:var(--surface)"/><rect x="13" y="7.2" width="4" height="4" rx="1" style="fill:var(--surface)"/><circle cx="8" cy="19.3" r="1.4" fill="currentColor"/><circle cx="16" cy="19.3" r="1.4" fill="currentColor"/></svg>',
+    cama: '<svg viewBox="0 0 24 24"><rect x="3" y="14" width="18" height="5" rx="1.6" fill="currentColor"/><rect x="4.2" y="9" width="6.4" height="4.2" rx="1.6" fill="currentColor" fill-opacity="0.55"/><path d="M3 19v2.2M21 19v2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    monumento: '<svg viewBox="0 0 24 24"><path d="M4 8.5l8-5 8 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="8.5" width="16" height="1.8" fill="currentColor"/><rect x="6" y="11.3" width="2" height="6" fill="currentColor"/><rect x="11" y="11.3" width="2" height="6" fill="currentColor"/><rect x="16" y="11.3" width="2" height="6" fill="currentColor"/><rect x="3" y="18.3" width="18" height="1.8" rx="0.8" fill="currentColor"/></svg>',
+    museo: '<svg viewBox="0 0 24 24"><rect x="3.6" y="4.2" width="16.8" height="14.2" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.3" cy="9" r="1.6" fill="currentColor"/><path d="M4.6 15l3.8-3.8 2.8 2.8 3.3-4.2 4.3 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    comida: '<svg viewBox="0 0 24 24"><path d="M8 3.5v6a1.6 1.6 0 003.2 0v-6M9.6 9.5V20.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 3.5c-1.3 0-2.2 1.4-2.2 3.2s.9 3.2 2.2 3.2v10.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    parque: '<svg viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="6.2" fill="currentColor"/><rect x="10.8" y="14.5" width="2.4" height="6.6" rx="1" fill="currentColor"/></svg>',
+    shopping: '<svg viewBox="0 0 24 24"><path d="M6.2 8h11.6l1 12.2H5.2L6.2 8z" fill="currentColor" fill-opacity="0.9"/><path d="M9 8V6.2a3 3 0 016 0V8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    show: '<svg viewBox="0 0 24 24"><path d="M3 9.3a2 2 0 010 4v2.7a1 1 0 001 1h16a1 1 0 001-1v-2.7a2 2 0 010-4V6.6a1 1 0 00-1-1H4a1 1 0 00-1 1v2.7z" fill="currentColor" fill-opacity="0.9"/><path d="M14 5.6v13" stroke="var(--surface)" stroke-width="1.6" stroke-dasharray="2 2.4"/></svg>',
+    paseo: '<svg viewBox="0 0 24 24"><circle cx="9.4" cy="5.6" r="1.8" fill="currentColor"/><path d="M8.4 8.6l-1.6 5 2 1 .8 5.2M8.4 8.6l3 1.1 1.6-2.1M12.6 15.2l3 1 1 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    playa: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4" fill="currentColor"/><path d="M3 15.8c1.5 1.5 3 1.5 4.5 0s3-1.5 4.5 0 3 1.5 4.5 0 3-1.5 4.5 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 19.3c1.5 1.5 3 1.5 4.5 0s3-1.5 4.5 0 3 1.5 4.5 0 3-1.5 4.5 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/></svg>',
+    ciudad: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 22s-8-7.6-8-13.2a8 8 0 1116 0C20 14.4 12 22 12 22z"/><circle cx="12" cy="8.6" r="3" style="fill:var(--surface)"/></svg>',
+    link: '<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5M19 5L10 14M8 5H6a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1v-2"/></svg>',
+  };
+  document.querySelectorAll('.icon-badge[data-cat]').forEach(el => {
+    if (!el.innerHTML.trim()) el.innerHTML = ICONS[el.dataset.cat === 'hospedaje' ? 'cama' : el.dataset.cat] || '';
+  });
+
+  const LINKS = {
+    sagradaFamilia: 'https://drive.google.com/file/d/1tRrKVCRBws5HaJx5957Zwf7EjeTCL_-J/view?usp=sharing',
+    parkGuell: 'https://drive.google.com/file/d/11Qf34N3yQ3bbXOqqLWEiRFtABBrkjYUQ/view?usp=sharing',
+  };
+
+  const DAYS = [
+    { wd: 'SÁB', num: 22, city: 'Camino a Madrid',
+      tickets: [
+        { cat: 'vuelo', icon: 'vuelo', time: '09:45', title: 'Resistencia → Aeroparque', sub: 'AR 1739 · vuelo doméstico', code: 'Reserva WWVPZQ' },
+        { cat: 'vuelo', icon: 'vuelo', time: '15:05', title: 'Vuelo a Madrid', sub: 'AR 1134 · Ezeiza → Madrid (llega mañana 08:20)', code: 'Silvana JGRWHY · Jorge/Graciela WWEMKL' },
+      ], manana: [], tarde: [], noche: [] },
+    { wd: 'DOM', num: 23, city: 'Madrid',
+      tickets: [
+        { cat: 'vuelo', icon: 'vuelo', time: '08:20', title: 'Llegada a Madrid', sub: 'AR 1134 desde Buenos Aires · Terminal 1', code: '' },
+      ], manana: [], tarde: [
+        { cat: 'actividad', icon: 'monumento', time: '17:00', title: 'Plaza Mayor', sub: 'Opcional · libre · sin entrada', loc: 'Plaza Mayor, Madrid' },
+        { cat: 'actividad', icon: 'monumento', time: '18:00', title: 'Palacio Real', sub: 'Opcional · comprar entrada', loc: 'Calle de Bailén s/n, Madrid' },
+      ], noche: [] },
+    { wd: 'LUN', num: 24, city: 'Madrid', tickets: [], manana: [], tarde: [
+        { cat: 'actividad', icon: 'shopping', time: '17:00', title: 'Gran Vía', sub: 'Opcional · libre · sin entrada', loc: 'Gran Vía, Madrid' },
+      ], noche: [] },
+    { wd: 'MAR', num: 25, city: 'Madrid → Barcelona',
+      tickets: [
+        { cat: 'traslado', icon: 'tren', time: '08:22', title: 'Tren a Barcelona', sub: 'iryo 06081 · Atocha-Almudena Grandes → Sants (3h02)', code: 'Reserva 48SM69 / 1Y4B2W' },
+      ],
+      manana: [],
+      tarde: [
+        { cat: 'actividad', icon: 'paseo', time: '12:00', title: 'La Rambla y Mercat de la Boqueria', sub: 'Paseo y mercado', loc: 'La Rambla, Barcelona' },
+        { cat: 'actividad', icon: 'monumento', time: '17:45', title: 'Sagrada Família — visita guiada', sub: 'Acceso 17:45 · tour a las 18:15 en español', info: 'Localizador 103206759', loc: 'Carrer de la Marina (entrada), Barcelona', link: LINKS.sagradaFamilia, linkLabel: 'Ver entradas' },
+      ],
+      noche: [] },
+    { wd: 'MIÉ', num: 26, city: 'Barcelona → Madrid',
+      tickets: [
+        { cat: 'traslado', icon: 'tren', time: '20:20', title: 'Tren a Madrid', sub: 'Ouigo 06610 · Sants → Atocha-Almudena Grandes (3h28, llega 23:48)', code: 'Reserva 48SM69 / 1Y4B2W' },
+      ],
+      manana: [
+        { cat: 'actividad', icon: 'parque', time: '11:00', title: 'Park Güell', sub: 'Llegar antes de las 10:45 · zona monumental', info: 'Reserva GYG32L3R8MRQ', loc: 'Ptge. de Sant Josep la Muntanya 46, Gràcia, Barcelona', link: LINKS.parkGuell, linkLabel: 'Ver entradas' },
+      ],
+      tarde: [
+        { cat: 'actividad', icon: 'paseo', time: '14:30', title: 'Barrio Gótico', sub: 'Último paseo antes del tren', loc: 'Barri Gòtic, Barcelona' },
+      ], noche: [] },
+    { wd: 'JUE', num: 27, city: 'Madrid', tickets: [], manana: [], tarde: [], noche: [] },
+    { wd: 'VIE', num: 28, city: 'Madrid', tickets: [], manana: [], tarde: [], noche: [] },
+    { wd: 'SÁB', num: 29, city: 'Madrid → Buenos Aires',
+      tickets: [
+        { cat: 'vuelo', icon: 'vuelo', time: '10:55', title: 'Vuelo a Buenos Aires', sub: 'AR 1135 · Madrid → Ezeiza (llega 19:00)', code: 'Silvana JGRWHY · Jorge/Graciela WWEMKL' },
+      ],
+      manana: [], tarde: [], noche: [] },
+    { wd: 'DOM', num: 30, city: 'Buenos Aires → Corrientes',
+      tickets: [
+        { cat: 'vuelo', icon: 'vuelo', time: '09:10', title: 'Vuelo a Corrientes', sub: 'AR 1748 · Ezeiza → Corrientes (llega 10:45)', code: 'Reserva WWVPZQ' },
+      ],
+      manana: [], tarde: [], noche: [] },
+  ];
+
+  function allItems(d) {
+    const items = [];
+    if (d.tickets) items.push(...d.tickets.map(t => ({ ...t, isTicket: true })));
+    items.push(...d.manana, ...d.tarde, ...d.noche);
+    return items;
+  }
+
+  const PIN = ICONS.ciudad.replace('width="24" height="24"', '');
+
+  document.querySelectorAll('.loc[data-addr]').forEach(el => {
+    const addr = el.dataset.addr;
+    el.innerHTML = `${PIN}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}" target="_blank" rel="noopener">Ver en el mapa</a>`;
+  });
+
+  function itemHTML(it) {
+    const loc = it.loc ? `<div class="loc">${PIN}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(it.loc)}" target="_blank" rel="noopener">${it.loc}</a></div>` : '';
+    const link = it.link ? `<div class="doc-link">${ICONS.link}<a href="${it.link}" target="_blank" rel="noopener">${it.linkLabel || 'Ver documento'}</a></div>` : '';
+    return `<div class="item" data-cat="${it.cat}">
+      <div class="icon-badge" data-cat="${it.cat}">${ICONS[it.icon] || ICONS[it.cat] || ''}</div>
+      <div class="content">
+        <div class="row1"><div class="title">${it.title}</div>${it.time ? `<div class="time mono">${it.time}</div>` : ''}</div>
+        ${it.sub ? `<div class="sub">${it.sub}</div>` : ''}
+        ${it.info ? `<div class="info">${it.info}</div>` : ''}
+        ${loc}
+        ${link}
+      </div>
+    </div>`;
+  }
+
+  function bandHTML(label, items) {
+    if (!items || !items.length) return `<div class="band"><span class="band-label">${label}</span><div class="band-empty">Sin planes</div></div>`;
+    return `<div class="band"><span class="band-label">${label}</span>${items.map(itemHTML).join('')}</div>`;
+  }
+
+  function ticketHTML(t) {
+    return `<div class="ticket" data-cat="${t.cat}">
+      <div class="icon-badge" data-cat="${t.cat}" style="width:42px;height:42px;">${ICONS[t.icon] || ICONS[t.cat]}</div>
+      <div class="body2">
+        <div class="title">${t.title}</div>
+        <div class="sub">${t.sub}</div>
+        ${t.code ? `<div class="code mono">${t.code}</div>` : ''}
+      </div>
+      <div class="time mono">${t.time}</div>
+    </div>`;
+  }
+
+  function ticketsHTML(arr) {
+    if (!arr || !arr.length) return '';
+    return arr.map(ticketHTML).join('');
+  }
+
+  // ---------- Home: route hero ----------
+  const ROUTE = [
+    { city: 'Resistencia', date: 'Sale sáb 22 · 09:45', kind: 'salida' },
+    { city: 'Madrid', date: '23 – 25 ago', kind: 'stop' },
+    { city: 'Barcelona', date: '25 – 26 ago', kind: 'stop' },
+    { city: 'Madrid', date: '26 – 29 ago', kind: 'stop' },
+    { city: 'Buenos Aires', date: '29 – 30 ago', kind: 'stop' },
+    { city: 'Corrientes', date: 'Llega dom 30 · 10:45', kind: 'llegada' },
+  ];
+  document.getElementById('route').innerHTML = ROUTE.map((n, i) => `
+    ${i > 0 ? '<div class="connector"></div>' : ''}
+    <div class="node" data-kind="${n.kind}"><div class="badge">${ICONS.ciudad}</div><div class="city">${n.city}</div><div class="date">${n.date}</div></div>
+  `).join('');
+
+  // ---------- Home: day list ----------
+  const daylist = document.getElementById('daylist');
+  daylist.innerHTML = DAYS.map((d, i) => {
+    const items = allItems(d);
+    const shown = items.slice(0, 3);
+    const restCount = items.length - shown.length;
+    const rows = shown.map(it => `<div class="hl-row"><span class="ic" data-cat="${it.cat}" style="background:var(--cat-${it.cat}-soft); color:var(--cat-${it.cat})">${ICONS[it.icon] || ICONS[it.cat] || ''}</span>${it.title}</div>`).join('');
+    const body = items.length
+      ? `<div class="highlights">${rows}${restCount > 0 ? `<div class="more">+${restCount} más</div>` : ''}</div>`
+      : `<div class="empty-note">Sin planes todavía</div>`;
+    return `<button class="daycard" data-day="${i}">
+      <div class="datebox"><span class="wd">${d.wd}</span><span class="num">${d.num}</span></div>
+      <div class="body">
+        <div class="city">${d.city}</div>
+        ${body}
+      </div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>`;
+  }).join('');
+
+  // ---------- Day detail ----------
+  const screenHome = document.getElementById('screen-home');
+  const screenDay = document.getElementById('screen-day');
+  let currentDay = 0;
+
+  function renderDay(i) {
+    currentDay = i;
+    const d = DAYS[i];
+    document.getElementById('dayTitle').textContent = `Día ${i + 1} · ${d.wd} ${d.num} ago`;
+    document.getElementById('dayCity').textContent = d.city;
+    const ticketsBlock = (d.tickets && d.tickets.length)
+      ? `<div class="ticket-section"><span class="ticket-section-label">Vuelos y trenes</span>${ticketsHTML(d.tickets)}</div><div class="day-divider"></div>`
+      : '';
+    document.getElementById('dayContent').innerHTML = ticketsBlock + bandHTML('Mañana', d.manana) + bandHTML('Tarde', d.tarde) + bandHTML('Noche', d.noche);
+    document.getElementById('prevBtn').disabled = i === 0;
+    document.getElementById('nextBtn').disabled = i === DAYS.length - 1;
+  }
+
+  function openDay(i) {
+    renderDay(i);
+    screenHome.classList.remove('active');
+    screenDay.classList.add('active');
+  }
+
+  daylist.addEventListener('click', e => {
+    const card = e.target.closest('.daycard');
+    if (card) openDay(Number(card.dataset.day));
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => { if (currentDay > 0) renderDay(currentDay - 1); });
+  document.getElementById('nextBtn').addEventListener('click', () => { if (currentDay < DAYS.length - 1) renderDay(currentDay + 1); });
+
+  // ---------- Swipe entre días (touch + mouse drag, para poder probarlo en desktop) ----------
+  // Escucha en document (no en screenDay) porque screenDay solo mide lo alto de su contenido:
+  // con días cortos queda una zona vacía debajo que screenDay no cubre.
+  let dragStartX = null, dragStartY = null, dragging = false;
+  document.addEventListener('pointerdown', e => {
+    if (!screenDay.classList.contains('active')) return;
+    dragStartX = e.clientX; dragStartY = e.clientY; dragging = true;
+    const capTarget = document.documentElement;
+    if (capTarget.setPointerCapture) { try { capTarget.setPointerCapture(e.pointerId); } catch (err) {} }
+  });
+  document.addEventListener('pointerup', e => {
+    if (!dragging || dragStartX === null) return;
+    dragging = false;
+    const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0 && currentDay < DAYS.length - 1) renderDay(currentDay + 1);
+      else if (dx > 0 && currentDay > 0) renderDay(currentDay - 1);
+    }
+  });
+  document.addEventListener('pointercancel', () => { dragging = false; });
+
+  // ---------- Bottom tabs ----------
+  const tabbar = document.getElementById('tabbar');
+  const panels = {
+    vuelos: document.getElementById('panel-vuelos'),
+    hospedaje: document.getElementById('panel-hospedaje'),
+  };
+  tabbar.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const tab = btn.dataset.tab;
+    tabbar.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+    Object.entries(panels).forEach(([k, el]) => el.classList.toggle('active', k === tab));
+    if (tab === 'itinerario') {
+      screenHome.classList.add('active'); screenDay.classList.remove('active');
+    } else {
+      screenHome.classList.remove('active'); screenDay.classList.remove('active');
+    }
+  });
+</script>
+</body>
+</html>
